@@ -1,0 +1,2850 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>☀️ Лето с математикой</title>
+  <style>
+    /* ============================================================
+       БАЗОВЫЕ СТИЛИ
+       ============================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 4px;
+      background: #0f0c29;
+      transition: background 1s ease;
+    }
+
+    body.night {
+      background: #0f0c29;
+    }
+
+    body.day {
+      background: linear-gradient(145deg, #fdfcfb 0%, #e2d1c3 100%);
+    }
+
+    .card {
+      max-width: 440px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius: 32px;
+      padding: 16px 12px 16px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: background 1s ease, transform 0.3s ease;
+      margin: 2px auto;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card.night-mode {
+      background: rgba(15, 12, 41, 0.85);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ============================================================
+       АНИМИРОВАННЫЙ ФОН
+       ============================================================ */
+    #particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card.night-mode #particles-canvas {
+      opacity: 1;
+    }
+    .card:not(.night-mode) #particles-canvas {
+      opacity: 0.2;
+    }
+
+    .star-rain {
+      position: absolute;
+      top: -10px;
+      font-size: 1.5rem;
+      pointer-events: none;
+      animation: rain linear forwards;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    @keyframes rain {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(0.5);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(900px) rotate(720deg) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    .card.night-mode .star-rain {
+      opacity: 0.9;
+    }
+
+    /* ============================================================
+       ДЕКОРАЦИИ
+       ============================================================ */
+    .sun {
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      font-size: 8rem;
+      opacity: 0.08;
+      animation: spin 20s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .card.night-mode .sun {
+      opacity: 0.03;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .cloud {
+      position: absolute;
+      color: rgba(255, 255, 255, 0.06);
+      font-size: 5rem;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card.night-mode .cloud {
+      opacity: 0.02;
+    }
+
+    .cloud-1 {
+      top: 5%;
+      left: -10%;
+      animation: cloudMove 25s linear infinite;
+    }
+    .cloud-2 {
+      bottom: 15%;
+      right: -15%;
+      animation: cloudMove 30s linear infinite reverse;
+      font-size: 6rem;
+    }
+
+    @keyframes cloudMove {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(120px);
+      }
+    }
+
+    .floating {
+      position: absolute;
+      pointer-events: none;
+      font-size: 2.5rem;
+      opacity: 0.08;
+      animation: float 6s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    .card.night-mode .floating {
+      opacity: 0.02;
+    }
+
+    .floating-1 { top: 8%; left: 6%; animation-delay: 0s; }
+    .floating-2 { top: 18%; right: 8%; animation-delay: 1.5s; }
+    .floating-3 { bottom: 30%; left: 4%; animation-delay: 3s; }
+    .floating-4 { bottom: 40%; right: 4%; animation-delay: 0.8s; }
+    .floating-5 { top: 50%; left: 12%; animation-delay: 2.2s; font-size: 1.8rem; }
+    .floating-6 { bottom: 20%; right: 12%; animation-delay: 4s; }
+
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-18px) rotate(8deg);
+      }
+    }
+
+    /* ============================================================
+       ОБЩИЕ СТИЛИ
+       ============================================================ */
+    .content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .page-welcome,
+    .page-menu,
+    .page-week,
+    .page-test,
+    .page-leaderboard {
+      width: 100%;
+    }
+
+    .page-menu,
+    .page-week,
+    .page-test,
+    .page-leaderboard {
+      display: none;
+    }
+
+    .page-menu.active,
+    .page-week.active,
+    .page-test.active,
+    .page-leaderboard.active {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ============================================================
+       КАРТИНКИ (SVG)
+       ============================================================ */
+    .icon {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      vertical-align: middle;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .icon-sun {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='30' fill='%23fcd34d'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23fbbf24'/%3E%3Cpath d='M50 10 L50 20 M50 80 L50 90 M10 50 L20 50 M80 50 L90 50 M22 22 L29 29 M71 71 L78 78 M22 78 L29 71 M71 29 L78 22' stroke='%23fcd34d' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+
+    .icon-palm {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 90 L50 50 M50 50 Q30 30 20 50 Q40 40 50 50 Q60 40 80 50 Q70 30 50 50' fill='%2334d399' stroke='%23259b6d' stroke-width='2'/%3E%3C/svg%3E");
+    }
+
+    .icon-beach {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M10 80 L90 80 L80 70 L20 70 Z' fill='%23fcd34d'/%3E%3Ccircle cx='30' cy='75' r='8' fill='%23f59e0b'/%3E%3C/svg%3E");
+    }
+
+    .icon-star {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 61,38 91,38 67,56 78,86 50,68 22,86 33,56 9,38 39,38' fill='%23fcd34d'/%3E%3C/svg%3E");
+    }
+
+    .top-icon {
+      width: 60px;
+      height: 60px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      display: inline-block;
+      margin-bottom: 6px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    /* ============================================================
+       ЗАГОЛОВКИ И ТЕКСТ
+       ============================================================ */
+    .title-main {
+      font-size: 2.8rem;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      margin-bottom: 2px;
+    }
+
+    .title-main .highlight {
+      background: linear-gradient(135deg, #fef9c3, #fde68a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+      text-shadow: 0 0 60px rgba(253, 230, 138, 0.2);
+    }
+
+    .title-main .math {
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      display: inline-block;
+    }
+
+    .title-sub {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+      margin-top: -4px;
+      margin-bottom: 8px;
+    }
+
+    .countdown {
+      margin: 4px 0 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 6px 16px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .countdown .num {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0 6px;
+      border-radius: 6px;
+      font-weight: 900;
+      font-size: 1rem;
+      color: #ffffff;
+    }
+
+    .slogan-wrap {
+      margin: 4px 0 10px 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .slogan {
+      font-size: 1.3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      display: inline-block;
+      color: #ffffff;
+      text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 35px rgba(245, 158, 11, 0.3);
+      letter-spacing: 1px;
+      line-height: 1.3;
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%,
+      100% {
+        box-shadow: 0 10px 35px rgba(245, 158, 11, 0.3);
+      }
+      50% {
+        box-shadow: 0 15px 50px rgba(245, 158, 11, 0.5);
+      }
+    }
+
+    .formulas {
+      margin: 6px 0 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .formula-card {
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #fcd34d;
+      text-shadow: 0 0 30px rgba(252, 211, 77, 0.2);
+      transition: all 0.3s ease;
+      cursor: default;
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    .divider {
+      width: 50px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      margin: 4px auto 6px;
+    }
+
+    .description {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 2px;
+      color: #ffffff;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .description .sub {
+      font-weight: 500;
+      opacity: 0.8;
+      font-size: 0.85rem;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .developer {
+      font-size: 0.85rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fcd34d, #f59e0b);
+      padding: 8px 16px;
+      border-radius: 40px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ============================================================
+       КНОПКИ
+       ============================================================ */
+    .btn-wrap {
+      margin-top: 12px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-start {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      font-family: 'Nunito', sans-serif;
+      color: #f59e0b;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      letter-spacing: 1.5px;
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-start:active {
+      transform: scale(0.97);
+    }
+
+    .btn-start .arrow {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* ============================================================
+       ТАЙМЕР НА ТЕСТ
+       ============================================================ */
+    .timer {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 6px 14px;
+      border-radius: 30px;
+      margin: 4px 0 10px 0;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .timer .time {
+      color: #fcd34d;
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .timer.warning .time {
+      color: #f87171;
+      animation: blink 0.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    /* ============================================================
+       КНОПКА ПЕРЕКЛЮЧЕНИЯ ТЕМЫ
+       ============================================================ */
+    .theme-toggle {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      padding: 4px 10px;
+      color: white;
+      font-size: 1.1rem;
+      cursor: pointer;
+      z-index: 5;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      opacity: 0.4;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px 10px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 3;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .summer-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      font-size: 0.55rem;
+      opacity: 0.2;
+      font-weight: 600;
+      letter-spacing: 1px;
+      z-index: 1;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ============================================================
+       МЕНЮ
+       ============================================================ */
+    .menu-header {
+      text-align: center;
+      margin-bottom: 10px;
+      padding-top: 4px;
+    }
+
+    .menu-header h2 {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+
+    .menu-header .slogan {
+      font-size: 1rem;
+      color: #fde68a;
+      font-weight: 700;
+      font-style: italic;
+      margin-top: 4px;
+      background: transparent;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+      animation: none;
+      text-shadow: 0 0 30px rgba(253, 230, 138, 0.2);
+    }
+
+    .menu-header .developer {
+      font-size: 0.7rem;
+      color: #8B4513;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 3px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    .menu-header p {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      margin-top: 2px;
+    }
+
+    .menu-divider {
+      border: none;
+      border-top: 2px solid rgba(255, 255, 255, 0.06);
+      margin: 12px 0;
+    }
+
+    .week-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 12px;
+      margin-bottom: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.3s;
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .week-card:active {
+      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .week-card-emoji {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .week-card-info {
+      flex: 1;
+    }
+
+    .week-card-title {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #ffffff;
+    }
+
+    .week-card-date {
+      color: #000000;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .week-card-meta {
+      color: #000000;
+      font-size: 0.65rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .week-card-meta span {
+      color: #000000;
+    }
+
+    .progress {
+      color: #4ade80;
+      font-weight: 700;
+      background: rgba(74, 222, 128, 0.15);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 0.6rem;
+    }
+
+    .btn-test {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 6px;
+      color: white;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-test:active {
+      transform: scale(0.97);
+    }
+
+    .btn-test-1 {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+    }
+    .btn-test-2 {
+      background: linear-gradient(135deg, #eab308, #f59e0b);
+    }
+    .btn-test-3 {
+      background: linear-gradient(135deg, #059669, #0891b2);
+    }
+    .btn-leaderboard {
+      background: linear-gradient(135deg, #f472b6, #ec4899);
+    }
+    .btn-google {
+      background: linear-gradient(135deg, #34a853, #1e8e3e);
+    }
+
+    /* ============================================================
+       ИНТЕРАКТИВНЫЕ ЗАДАНИЯ
+       ============================================================ */
+    .options-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0;
+    }
+
+    .option-btn {
+      flex: 1;
+      min-width: 50px;
+      padding: 8px 10px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option-btn:active {
+      transform: scale(0.95);
+    }
+
+    .option-btn.selected {
+      border-color: #fcd34d;
+      background: rgba(252, 211, 77, 0.2);
+      box-shadow: 0 0 15px rgba(252, 211, 77, 0.15);
+    }
+
+    .option-btn.correct {
+      border-color: #4ade80;
+      background: rgba(74, 222, 128, 0.2);
+    }
+
+    .option-btn.wrong {
+      border-color: #f87171;
+      background: rgba(248, 113, 113, 0.2);
+    }
+
+    .option-btn.disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+
+    .option-btn.disabled:active {
+      transform: none;
+    }
+
+    /* ============================================================
+       ТАБЛИЦА ЛИДЕРОВ
+       ============================================================ */
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+
+    .leaderboard-table th {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fcd34d;
+      padding: 8px 6px;
+      text-align: center;
+      font-weight: 800;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .leaderboard-table td {
+      padding: 8px 6px;
+      text-align: center;
+      color: #ffffff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .leaderboard-table .rank-1 {
+      color: #fcd34d;
+      font-weight: 900;
+    }
+    .leaderboard-table .rank-2 {
+      color: #94a3b8;
+      font-weight: 800;
+    }
+    .leaderboard-table .rank-3 {
+      color: #cd7f32;
+      font-weight: 800;
+    }
+
+    .leaderboard-form {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+
+    .leaderboard-form input {
+      flex: 1;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: white;
+      font-size: 0.85rem;
+      font-family: 'Nunito', sans-serif;
+      min-width: 80px;
+    }
+
+    .leaderboard-form input:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .leaderboard-form input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      background: linear-gradient(135deg, #059669, #0891b2);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-small:active {
+      transform: scale(0.95);
+    }
+
+    .btn-small-danger {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+    }
+
+    .btn-small-google {
+      background: linear-gradient(135deg, #34a853, #1e8e3e);
+    }
+
+    /* ============================================================
+       СТРАНИЦА НЕДЕЛИ
+       ============================================================ */
+    .back-btn {
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 50px;
+      margin-bottom: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+      font-family: 'Nunito', sans-serif;
+      color: white;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .back-btn:active {
+      transform: scale(0.95);
+    }
+
+    .week-header {
+      margin-bottom: 10px;
+      text-align: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .week-header .emoji {
+      font-size: 1.8rem;
+      margin-bottom: 2px;
+    }
+
+    .week-header h2 {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .week-header p {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .section h3 {
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .analysis-box {
+      background: rgba(0, 0, 0, 0.15);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border-left: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .analysis-box h4 {
+      color: #fcd34d;
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .analysis-box p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      white-space: pre-line;
+      line-height: 1.6;
+    }
+
+    .analysis-box .step {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .analysis-box .step::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+    }
+
+    .answer {
+      color: #4ade80;
+      font-weight: 800;
+      font-size: 0.85rem;
+      background: rgba(74, 222, 128, 0.1);
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    .ref-list {
+      list-style: none;
+    }
+
+    .ref-list li {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      border-left: 3px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .trick-box {
+      background: rgba(0, 0, 0, 0.15);
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #eab308;
+      position: relative;
+    }
+
+    .trick-box::before {
+      content: '💡';
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      font-size: 1.3rem;
+      background: transparent;
+      padding: 0 4px;
+    }
+
+    .trick-box h4 {
+      color: #eab308;
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .trick-box p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .task {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .task label {
+      display: block;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      white-space: pre-line;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .task .options {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+      white-space: pre-line;
+      line-height: 1.5;
+      margin-bottom: 6px;
+      font-weight: 400;
+    }
+
+    .task input {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+      font-size: 0.85rem;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.3s;
+    }
+
+    .task input:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .task input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .task-result {
+      margin-top: 6px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: none;
+    }
+
+    .task-result.correct {
+      background: rgba(74, 222, 128, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      display: block;
+    }
+
+    .task-result.wrong {
+      background: rgba(248, 113, 113, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      display: block;
+    }
+
+    .send-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #059669, #0891b2);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.3s;
+      font-family: 'Nunito', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .send-btn:active {
+      transform: scale(0.97);
+    }
+
+    .check-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.3s;
+      font-family: 'Nunito', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .check-btn:active {
+      transform: scale(0.97);
+    }
+
+    .check-btn.hidden {
+      display: none;
+    }
+
+    .email-note {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.7rem;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .motivation {
+      margin-top: 10px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .motivation-emoji {
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+
+    .motivation-text {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-style: italic;
+    }
+
+    .motivation-author {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.7rem;
+      margin-top: 4px;
+    }
+
+    .scroll-area {
+      max-height: 450px;
+      overflow-y: auto;
+      padding-right: 4px;
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .scroll-area::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .scroll-area::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+
+    .scroll-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* ============================================================
+       ТЕСТЫ
+       ============================================================ */
+    .test-header {
+      margin-bottom: 10px;
+      text-align: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .test-header h2 {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .test-header p {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .test-question {
+      margin-bottom: 12px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      border-left: 3px solid rgba(168, 85, 247, 0.4);
+    }
+
+    .test-question .question-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      white-space: pre-line;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .test-question .options {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      white-space: pre-line;
+      margin-bottom: 6px;
+    }
+
+    .test-question input {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+      font-size: 0.85rem;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .test-question input:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .test-result-summary {
+      text-align: center;
+      padding: 10px;
+      background: rgba(74, 222, 128, 0.1);
+      border-radius: 10px;
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      margin-top: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #4ade80;
+    }
+
+    /* ============================================================
+       АДАПТИВ (ТЕЛЕФОН)
+       ============================================================ */
+    @media (max-width: 440px) {
+      .card {
+        padding: 12px 8px 12px;
+        border-radius: 24px;
+        min-height: 100vh;
+      }
+
+      .title-main {
+        font-size: 2.2rem;
+      }
+      .title-sub {
+        font-size: 1.0rem;
+        letter-spacing: 3px;
+      }
+      .slogan {
+        font-size: 1.1rem;
+        padding: 8px 16px;
+      }
+      .formula-card {
+        font-size: 1.0rem;
+        padding: 6px 12px;
+        max-width: 240px;
+      }
+      .btn-start {
+        font-size: 0.95rem;
+        padding: 12px;
+      }
+      .developer {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+      }
+      .countdown {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+      }
+      .countdown .num {
+        font-size: 0.85rem;
+      }
+      .top-icon {
+        width: 48px;
+        height: 48px;
+      }
+      .sun {
+        font-size: 4rem;
+        top: -15px;
+        right: -15px;
+      }
+      .floating {
+        display: none;
+      }
+      .cloud {
+        display: none;
+      }
+
+      .menu-header h2 {
+        font-size: 1.2rem;
+      }
+      .week-card-title {
+        font-size: 0.85rem;
+      }
+      .week-card-date {
+        font-size: 0.65rem;
+      }
+      .week-card-meta {
+        font-size: 0.6rem;
+      }
+      .btn-test {
+        font-size: 0.85rem;
+        padding: 10px;
+      }
+      .scroll-area {
+        max-height: 350px;
+      }
+
+      .option-btn {
+        font-size: 0.75rem;
+        padding: 6px 8px;
+        min-width: 40px;
+      }
+      .leaderboard-table {
+        font-size: 0.7rem;
+      }
+      .leaderboard-table th,
+      .leaderboard-table td {
+        padding: 4px 3px;
+      }
+
+      .timer {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+      }
+      .timer .time {
+        font-size: 1.0rem;
+      }
+
+      .section {
+        padding: 10px;
+      }
+      .section h3 {
+        font-size: 0.9rem;
+      }
+      .analysis-box h4 {
+        font-size: 0.85rem;
+      }
+      .analysis-box p {
+        font-size: 0.8rem;
+      }
+      .trick-box h4 {
+        font-size: 0.85rem;
+      }
+      .trick-box p {
+        font-size: 0.8rem;
+      }
+      .task label {
+        font-size: 0.8rem;
+      }
+      .task input {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+      }
+      .test-question .question-text {
+        font-size: 0.8rem;
+      }
+      .test-header h2 {
+        font-size: 1.0rem;
+      }
+      .motivation-text {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .title-main {
+        font-size: 1.8rem;
+      }
+      .title-sub {
+        font-size: 0.85rem;
+      }
+      .slogan {
+        font-size: 0.95rem;
+        padding: 6px 12px;
+      }
+      .formula-card {
+        font-size: 0.85rem;
+        padding: 4px 10px;
+        max-width: 200px;
+      }
+      .btn-start {
+        font-size: 0.85rem;
+        padding: 10px;
+      }
+      .card {
+        padding: 10px 6px 10px;
+        border-radius: 20px;
+      }
+      .developer {
+        font-size: 0.65rem;
+        padding: 4px 10px;
+      }
+      .top-icon {
+        width: 40px;
+        height: 40px;
+      }
+      .week-card {
+        padding: 8px 10px;
+      }
+      .week-card-title {
+        font-size: 0.8rem;
+      }
+      .scroll-area {
+        max-height: 300px;
+      }
+      .timer {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+      }
+      .timer .time {
+        font-size: 0.9rem;
+      }
+      .leaderboard-form input {
+        font-size: 0.75rem;
+        padding: 6px 8px;
+        min-width: 60px;
+      }
+      .btn-small {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="card">
+
+    <!-- Бейджики -->
+    <div class="badge">☀️ 2026</div>
+    <div class="summer-badge">✦ ЛЕТО 2026 ✦</div>
+
+    <!-- Кнопка смены темы -->
+    <button class="theme-toggle" id="themeToggle" title="Сменить тему">🌙</button>
+
+    <!-- Анимированный фон -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Летние декорации -->
+    <div class="sun">☀️</div>
+    <div class="cloud cloud-1">☁️</div>
+    <div class="cloud cloud-2">☁️</div>
+    <div class="floating floating-1">🌴</div>
+    <div class="floating floating-2">🍉</div>
+    <div class="floating floating-3">⛵</div>
+    <div class="floating floating-4">🐚</div>
+    <div class="floating floating-5">🌟</div>
+    <div class="floating floating-6">🌈</div>
+
+    <!-- ============================================================ -->
+    <!-- ГЛАВНАЯ СТРАНИЦА -->
+    <!-- ============================================================ -->
+    <div id="page-welcome" class="page-welcome">
+      <div class="content">
+        <div class="top-icon icon-beach"></div>
+
+        <div class="title-main">
+          <span class="highlight">ЛЕТО</span><br />
+          <span class="math">С МАТЕМАТИКОЙ</span>
+        </div>
+        <div class="title-sub">✦ ОЛИМПИАДА ✦</div>
+
+        <div class="countdown" id="countdown">
+          ⏳ До олимпиады: <span class="num" id="days">--</span> дн.
+          <span class="num" id="hours">--</span> ч.
+        </div>
+
+        <div class="slogan-wrap">
+          <div class="slogan">🏆 Каждый день — шаг к победе!</div>
+        </div>
+
+        <div class="formulas">
+          <span class="formula-card">100% = 1</span>
+          <span class="formula-card">5² = 25</span>
+          <span class="formula-card">0! = 1</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="description">
+          📐 Математика + Веселье 💯
+          <span class="sub">Подготовка к математическим олимпиадам</span>
+        </div>
+
+        <div class="developer">
+          <span class="label">✏️</span>
+          Альмагамбетова Зибагуль Агайдаровна
+        </div>
+
+        <div class="btn-wrap">
+          <button class="btn-start" onclick="showMenu()">
+            🎯 Начать приключение! <span class="arrow">→</span>
+          </button>
+          <button class="btn-start btn-secondary" onclick="showLeaderboard()">
+            🏆 Таблица лидеров
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- МЕНЮ -->
+    <!-- ============================================================ -->
+    <div id="page-menu" class="page-menu">
+      <div class="menu-header">
+        <h2>📚 Программа занятий</h2>
+        <div class="slogan">«Каждый день — шаг к победе!»</div>
+        <div class="developer">✏️ Разработчик: Альмагамбетова Зибагуль Агайдаровна</div>
+        <p>8 недель математических открытий</p>
+      </div>
+
+      <div class="scroll-area" id="menu-list"></div>
+
+      <hr class="menu-divider" />
+
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="btn-test btn-test-1" onclick="showTest('5class-22-23')">📝 5 класс (2022-2023)</button>
+        <button class="btn-test btn-test-2" onclick="showTest('5class-24-25')">📝 5 класс (2024-2025)</button>
+        <button class="btn-test btn-test-3" onclick="showTest('6class-24-25')">📝 6 класс (2024-2025)</button>
+        <button class="btn-test btn-leaderboard" onclick="showLeaderboard()">🏆 Таблица лидеров</button>
+        <button class="btn-test btn-google" onclick="exportToGoogleSheets()">📊 Отправить в Google Таблицы</button>
+      </div>
+
+      <div class="btn-wrap" style="margin-top:10px;">
+        <button class="btn-start" onclick="showWelcome()" style="font-size:0.85rem;padding:10px;">
+          ← На главную
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- СТРАНИЦА НЕДЕЛИ -->
+    <!-- ============================================================ -->
+    <div id="page-week" class="page-week">
+      <button class="back-btn" onclick="showMenu()">← Назад</button>
+      <div class="week-header">
+        <div class="emoji" id="week-emoji"></div>
+        <h2 id="week-title"></h2>
+        <p id="week-dates"></p>
+      </div>
+      <div class="scroll-area" id="week-content"></div>
+      <div class="btn-wrap" style="margin-top:10px;">
+        <button class="btn-start" onclick="showMenu()" style="font-size:0.85rem;padding:10px;">
+          ← Вернуться к программе
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- СТРАНИЦА ТЕСТА -->
+    <!-- ============================================================ -->
+    <div id="page-test" class="page-test">
+      <button class="back-btn" onclick="showMenu()">← Назад</button>
+      <div class="test-header">
+        <h2 id="test-title"></h2>
+        <p id="test-subtitle"></p>
+      </div>
+      <div class="timer" id="test-timer">
+        ⏱️ Время: <span class="time" id="timer-display">05:00</span>
+      </div>
+      <div class="scroll-area" id="test-content"></div>
+      <div class="btn-wrap" style="margin-top:10px;">
+        <button class="btn-start" onclick="showMenu()" style="font-size:0.85rem;padding:10px;">
+          ← Вернуться к программе
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ТАБЛИЦА ЛИДЕРОВ -->
+    <!-- ============================================================ -->
+    <div id="page-leaderboard" class="page-leaderboard">
+      <button class="back-btn" onclick="showMenu()">← Назад</button>
+      <div class="test-header">
+        <h2>🏆 Таблица лидеров</h2>
+        <p>Самые активные ученики</p>
+      </div>
+      <div class="section" style="text-align:center;">
+        <div class="leaderboard-form">
+          <input type="text" id="leaderName" placeholder="👤 Имя" />
+          <input type="number" id="leaderScore" placeholder="⭐ Баллы" />
+          <button class="btn-small" onclick="addLeader()">➕ Добавить</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+          <button class="btn-small btn-small-danger" onclick="clearLeaderboard()">🗑️ Очистить</button>
+          <button class="btn-small btn-small-google" onclick="exportToGoogleSheets()">📊 Google</button>
+        </div>
+        <div id="leaderboard-list" style="margin-top:10px;"></div>
+      </div>
+      <div class="btn-wrap" style="margin-top:10px;">
+        <button class="btn-start" onclick="showMenu()" style="font-size:0.85rem;padding:10px;">
+          ← Вернуться к программе
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ============================================================
+    // 1. ЗВУКИ
+    // ============================================================
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSound(type) {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+          oscillator.frequency.value = 880;
+          oscillator.type = 'sine';
+          gainNode.gain.value = 0.12;
+          oscillator.start();
+          setTimeout(() => {
+            oscillator.frequency.value = 1100;
+          }, 100);
+          setTimeout(() => {
+            oscillator.stop();
+          }, 250);
+        } else if (type === 'wrong') {
+          oscillator.frequency.value = 330;
+          oscillator.type = 'sawtooth';
+          gainNode.gain.value = 0.08;
+          oscillator.start();
+          setTimeout(() => {
+            oscillator.frequency.value = 220;
+          }, 150);
+          setTimeout(() => {
+            oscillator.stop();
+          }, 350);
+        } else if (type === 'complete') {
+          const notes = [523, 659, 784, 1047];
+          notes.forEach((freq, i) => {
+            setTimeout(() => {
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.frequency.value = freq;
+              osc.type = 'sine';
+              gain.gain.value = 0.1;
+              osc.start();
+              setTimeout(() => osc.stop(), 150);
+            }, i * 150);
+          });
+        }
+      } catch (e) {}
+    }
+
+    // ============================================================
+    // 2. ЧАСТИЦЫ
+    // ============================================================
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const symbols = ['π', '∞', '∑', '√', '∫', 'Δ', 'θ', 'α', 'β', 'γ', '✧', '✦', '★'];
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 16 + 8;
+        this.symbol = symbols[Math.floor(Math.random() * symbols.length)];
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.12 + 0.03;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.rotation += this.rotationSpeed;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.font = `${this.size}px 'Nunito', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+        ctx.fillText(this.symbol, 0, 0);
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < 30; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update();
+        p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ============================================================
+    // 3. ЗВЁЗДНЫЙ ДОЖДЬ
+    // ============================================================
+    function createStarRain() {
+      const card = document.getElementById('card');
+      const emojis = ['⭐', '✨', '🌟', '💫', '✦', '✧'];
+      for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+          const star = document.createElement('div');
+          star.className = 'star-rain';
+          star.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          star.style.left = Math.random() * 90 + 5 + '%';
+          star.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
+          star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          card.appendChild(star);
+          setTimeout(() => star.remove(), 4000);
+        }, i * 100);
+      }
+    }
+
+    // ============================================================
+    // 4. ТАЙМЕР
+    // ============================================================
+    function updateCountdown() {
+      const target = new Date('2026-10-10T00:00:00').getTime();
+      const now = Date.now();
+      const diff = Math.max(0, target - now);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      document.getElementById('days').textContent = String(days).padStart(2, '0');
+      document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 60000);
+
+    // ============================================================
+    // 5. СМЕНА ТЕМЫ
+    // ============================================================
+    let isNight = false;
+    document.getElementById('themeToggle').addEventListener('click', function() {
+      isNight = !isNight;
+      const card = document.getElementById('card');
+      const body = document.body;
+      if (isNight) {
+        card.classList.add('night-mode');
+        body.classList.add('night');
+        body.classList.remove('day');
+        this.textContent = '☀️';
+      } else {
+        card.classList.remove('night-mode');
+        body.classList.add('day');
+        body.classList.remove('night');
+        this.textContent = '🌙';
+      }
+      createStarRain();
+    });
+
+    // ============================================================
+    // 6. НАВИГАЦИЯ
+    // ============================================================
+    function showWelcome() {
+      document.getElementById('page-welcome').style.display = 'block';
+      document.getElementById('page-menu').classList.remove('active');
+      document.getElementById('page-week').classList.remove('active');
+      document.getElementById('page-test').classList.remove('active');
+      document.getElementById('page-leaderboard').classList.remove('active');
+      updateCountdown();
+    }
+
+    function showMenu() {
+      document.getElementById('page-welcome').style.display = 'none';
+      document.getElementById('page-menu').classList.add('active');
+      document.getElementById('page-week').classList.remove('active');
+      document.getElementById('page-test').classList.remove('active');
+      document.getElementById('page-leaderboard').classList.remove('active');
+      renderMenu();
+    }
+
+    function showWeek(weekId) {
+      selectedWeek = curriculum.find(w => w.id === weekId);
+      document.getElementById('page-welcome').style.display = 'none';
+      document.getElementById('page-menu').classList.remove('active');
+      document.getElementById('page-week').classList.add('active');
+      document.getElementById('page-test').classList.remove('active');
+      document.getElementById('page-leaderboard').classList.remove('active');
+      renderWeek();
+    }
+
+    function showTest(testId) {
+      document.getElementById('page-welcome').style.display = 'none';
+      document.getElementById('page-menu').classList.remove('active');
+      document.getElementById('page-week').classList.remove('active');
+      document.getElementById('page-test').classList.add('active');
+      document.getElementById('page-leaderboard').classList.remove('active');
+      renderTest(testId);
+      startTestTimer();
+    }
+
+    function showLeaderboard() {
+      document.getElementById('page-welcome').style.display = 'none';
+      document.getElementById('page-menu').classList.remove('active');
+      document.getElementById('page-week').classList.remove('active');
+      document.getElementById('page-test').classList.remove('active');
+      document.getElementById('page-leaderboard').classList.add('active');
+      renderLeaderboard();
+    }
+
+    // ============================================================
+    // 7. ТАЙМЕР НА ТЕСТ
+    // ============================================================
+    let testTimerInterval = null;
+    let testTimeLeft = 300;
+    let testTimerActive = false;
+
+    function startTestTimer() {
+      if (testTimerActive) return;
+      testTimerActive = true;
+      testTimeLeft = 300;
+      updateTimerDisplay();
+
+      testTimerInterval = setInterval(() => {
+        testTimeLeft--;
+        updateTimerDisplay();
+
+        if (testTimeLeft <= 60) {
+          document.getElementById('test-timer').classList.add('warning');
+        }
+
+        if (testTimeLeft <= 0) {
+          clearInterval(testTimerInterval);
+          testTimerActive = false;
+          alert('⏰ Время вышло!');
+          checkTestInteractive(currentTestId);
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(testTimeLeft / 60);
+      const secs = testTimeLeft % 60;
+      document.getElementById('timer-display').textContent =
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function stopTestTimer() {
+      if (testTimerInterval) {
+        clearInterval(testTimerInterval);
+        testTimerInterval = null;
+        testTimerActive = false;
+        document.getElementById('test-timer').classList.remove('warning');
+      }
+    }
+
+    // ============================================================
+    // 8. ЭКСПОРТ В GOOGLE ТАБЛИЦЫ
+    // ============================================================
+    function exportToGoogleSheets() {
+      const leaders = getLeaders();
+      if (leaders.length === 0) {
+        alert('Нет данных для экспорта!');
+        return;
+      }
+
+      let csv = 'Имя,Баллы,Дата\n';
+      leaders.forEach(l => {
+        csv += `${l.name},${l.score},${l.date || ''}\n`;
+      });
+
+      navigator.clipboard.writeText(csv).then(() => {
+        alert('✅ Данные скопированы в буфер обмена!\n\n1. Откройте Google Таблицы\n2. Вставьте данные (Ctrl+V)');
+        window.open('https://docs.google.com/spreadsheets/create', '_blank');
+      }).catch(() => {
+        alert(`📊 Данные для копирования:\n\n${csv}`);
+      });
+    }
+
+    // ============================================================
+    // 9. ДАННЫЕ
+    // ============================================================
+    const TEACHER_EMAIL = 'zibagul_@mail.ru';
+    let answers = {};
+    let testAnswers = {};
+    let selectedWeek = null;
+    let currentTestId = null;
+
+    const correctAnswers = {
+      1: ['7', '4', '6', '9', '7'],
+      2: ['41', '31', '46', '41', '9', '9', '42', '127', '3', '72'],
+      3: ['3558', 'ҚАЗАҚ', 'АЛМАЗ', '498302'],
+      4: ['125', '10', '68', '36', '(2,5,7)'],
+      5: ['В', 'D', 'D', 'D', 'В', 'А', 'С', 'В', 'В', 'D'],
+      6: ['900', '75', '60000', '10', '500'],
+      7: ['120', '120', '24', '15', '28'],
+      8: ['C', 'C', '234', '2500,1395,2550']
+    };
+
+    const testData = {
+      '5class-22-23': {
+        title: '5 класс (2022-2023)',
+        subtitle: '10 вопросов с выбором ответа',
+        questions: [
+          { text: '1. Мама старше дочери на 23 года. Сколько лет дочери, если сумма их возрастов равна 65?', options: ['A) 17', 'B) 21', 'C) 23', 'D) 44'], answer: 'B' },
+          { text: '2. Решите рациональным способом: 2022 × 28 + 1011 × 44.', options: ['A) 101010', 'B) 101100', 'C) 101101', 'D) 110110'], answer: 'B' },
+          { text: '3. В школе Zerdeli уроки начинаются в 8:15. Каждый урок длится 45 минут, а перемены по 10 минут. Во сколько закончатся 8 уроков?', options: ['A) 12:45', 'B) 12:55', 'C) 15:25', 'D) 15:35'], answer: 'C' },
+          { text: '4. Сумма двух простых чисел равна 99. Чему равно произведение этих чисел?', options: ['A) 150', 'B) 194', 'C) 198', 'D) 288'], answer: 'B' },
+          { text: '5. За сколько времени поезд пройдет полностью мост длиной 1 км, если длина поезда 200 м, а скорость 36 км/ч?', options: ['A) 22 сек', 'B) 33 сек', 'C) 80 сек', 'D) 120 сек'], answer: 'D' },
+          { text: '6. Если Аскар движется со скоростью 36 км/ч, он на 20 минут опоздает на работу, а если увеличит скорость до 60 км/ч, наоборот, доедет на 20 минут раньше. С какой скоростью должен двигаться Аскар, чтобы быть на работе вовремя?', options: ['A) 40 км/ч', 'B) 45 км/ч', 'C) 48 км/ч', 'D) 50 км/ч'], answer: 'B' },
+          { text: '7. У каждого из трех человек была определенная сумма. ... Сколько денег было у первого вначале?', options: ['A) 4100 тг', 'B) 5100 тг', 'C) 5500 тг', 'D) 6000 тг'], answer: 'C' },
+          { text: '8. На уроке физкультуры пятиклассники встали в строй по одному. Максат стоит 5-м по счету если считать с начала, 18-м с конца. Сколько учеников в строю?', options: ['A) 22', 'B) 23', 'C) 24', 'D) 21'], answer: 'A' },
+          { text: '9. Если Максат отдаст 10 яблок Ерасылу, то у них яблок станет поровну. Если Ерасыл отдаст 10 яблок Канату, то у них яблок станет поровну. Сколько яблок у Каната, если вместе у ребят 210 яблок?', options: ['A) 60', 'B) 70', 'C) 50', 'D) 90'], answer: 'B' },
+          { text: '10. В день Аскар, Ермахан и Алимырза съедают по 2, 3, 4 мороженого соответственно. Сколько мороженых съест Алимырза в то время, когда они все вместе съедают 54 мороженых?', options: ['A) 12', 'B) 18', 'C) 24', 'D) 30'], answer: 'C' }
+        ]
+      },
+      '5class-24-25': {
+        title: '5 класс (2024-2025)',
+        subtitle: '7 вопросов с выбором ответа',
+        questions: [
+          { text: '1. Выберите ряд простых чисел:', options: ['A) 1; 3; 5; 7; 9', 'B) 2; 4; 6; 8', 'C) 2; 13; 17; 29', 'D) 15; 27; 37'], answer: 'C' },
+          { text: '2. На базаре можно обменять 4 яблока на 3 банана. Если одно яблоко стоит 60 тенге, сколько стоит один банан?', options: ['A) 45 тг', 'B) 60 тг', 'C) 80 тг', 'D) 90 тг'], answer: 'C' },
+          { text: '3. Когда Мирасу было 8 лет, Кайрату было 12. Когда Кайрату было 15 лет, Самату было 17. Сколько лет будет Мирасу, когда Самату будет 15?', options: ['A) 9', 'B) 10', 'C) 11', 'D) 12'], answer: 'C' },
+          { text: '4. Сколько нужно вычесть из числа 7112, чтобы изменилась только цифра в разряде сотен?', options: ['A) 1000', 'B) 1190', 'C) 2024', 'D) 2101'], answer: 'A' },
+          { text: '5. Новый спортзал впервые открылся 2 марта, в среду. Если он работает только с понедельника по пятницу каждую неделю, на какой день приходится его 21-й рабочий день?', options: ['A) 27 марта', 'B) 28 марта', 'C) 29 марта', 'D) 30 марта'], answer: 'C' },
+          { text: '6. В следующей последовательности, начиная с третьего члена, каждый следующий член равен последней цифре произведения двух предыдущих членов. Найдите 2024-й член этой последовательности.\n7, 3, 1, 3, 3, 9, 7, ...', options: ['A) 1', 'B) 3', 'C) 5', 'D) 7'], answer: 'D' },
+          { text: '7. Укажите наименьшую неправильную дробь.', options: ['A) 1/2024', 'B) 1001/1000', 'C) 3/10', 'D) 2024/1003'], answer: 'B' }
+        ]
+      },
+      '6class-24-25': {
+        title: '6 класс (2024-2025)',
+        subtitle: '7 вопросов с выбором ответа',
+        questions: [
+          { text: '1. Выберите ряд простых чисел:', options: ['A) 1; 3; 5; 7; 9', 'B) 2; 4; 6; 8', 'C) 2; 13; 17; 29', 'D) 15; 27; 37'], answer: 'C' },
+          { text: '2. На базаре можно обменять 4 яблока на 3 банана. Если одно яблоко стоит 60 тенге, сколько стоит один банан?', options: ['A) 45 тг', 'B) 60 тг', 'C) 80 тг', 'D) 90 тг'], answer: 'C' },
+          { text: '3. Укажите наименьшую неправильную дробь.', options: ['A) 1/2024', 'B) 1001/1000', 'C) 3/10', 'D) 2024/1003'], answer: 'B' },
+          { text: '4. Решите уравнение: x/7 + 1/14 = 4 − 2/14', options: ['A) 1', 'B) 6', 'C) 7', 'D) 8'], answer: 'D' },
+          { text: '5. Прямоугольный сад длиной 60 метров и шириной 20 метров огорожен забором. Чтобы сделать сад больше, его форму изменили на квадрат, используя тот же забор. Насколько увеличилась площадь сада в м²?', options: ['A) 200 м²', 'B) 400 м²', 'C) 600 м²', 'D) 800 м²'], answer: 'B' },
+          { text: '6. Ученики посадили по одному дереву через каждые 9 метров вдоль одной стороны дороги длиной 72 метра. Сколько всего деревьев было посажено?', options: ['A) 7', 'B) 8', 'C) 9', 'D) 10'], answer: 'C' },
+          { text: '7. Ерасыл двигался в течение 9 минут. В первую минуту его скорость была 1 км/ч, во вторую минуту — 2 км/ч, ... Сколько всего метров прошел Ерасыл?', options: ['A) 500 м', 'B) 600 м', 'C) 750 м', 'D) 1000 м'], answer: 'C' }
+        ]
+      }
+    };
+
+    const motivations = [
+      { text: "Математика — это не страх, это суперсила!", emoji: "🦸", author: "— Твой внутренний герой" },
+      { text: "Ошибки — это просто шаги к победе. Главное — не сдаваться!", emoji: "💪", author: "— Мудрый математик" },
+      { text: "Ты уже умнее, чем был вчера. Продолжай в том же духе!", emoji: "🌟", author: "— Твой прогресс" },
+      { text: "Каждый решённый пример — это +1 к твоей силе!", emoji: "⚡", author: "— Система достижений" },
+      { text: "Геометрия — это искусство мышления. Ты художник своего разума!", emoji: "🎨", author: "— Платон" },
+      { text: "Проценты — это легко, когда знаешь секрет!", emoji: "🎯", author: "— Твой мозг" },
+      { text: "Комбинаторика учит видеть варианты. В жизни всегда есть выход!", emoji: "🔮", author: "— Оптимист" },
+      { text: "Метод Гаусса открыл мальчик в 10 лет. Ты тоже можешь открыть своё!", emoji: "🏆", author: "— История математики" }
+    ];
+
+    const curriculum = [{
+      id: 1,
+      title: "Задачи на движение",
+      dates: "1–7 июля",
+      emoji: "🐌",
+      theory: {
+        analysis: {
+          title: "Улитка и дерево",
+          condition: "Улитка за день заползает вверх по дереву на 4 м, а за ночь сползает на 2 м. Высота дерева 12 м. За сколько дней улитка достигнет вершины?",
+          solution: [
+            "За день + ночь: 4 м − 2 м = 2 м чистого подъёма",
+            "За 4 полных дня: 2 м × 4 = 8 м",
+            "На 5-й день (днём): 8 м + 4 м = 12 м ✓"
+          ],
+          answer: "5 дней"
+        },
+        reference: [
+          "Чистый подъём за сутки = подъём днём − спуск ночью",
+          "В последний день считаем только дневной подъём (улитка уже добралась!)"
+        ],
+        trick: {
+          title: "«Улитка, которая всегда побеждает»",
+          text: "В последний день улитка не сползает ночью, потому что уже достигла вершины!"
+        }
+      },
+      homework: [
+        "1. Улитка за день заползает на 4 м, за ночь сползает на 3 м. Высота 10 м. За сколько дней?",
+        "2. Улитка за день заползает на 4 м, за ночь сползает на 1 м. Высота 13 м. За сколько дней?",
+        "3. Улитка за день заползает на 4 м, за ночь сползает на 2 м. Высота 14 м. За сколько дней?",
+        "4. Улитка за день заползает на 2 м, за ночь сползает на 1 м. Высота 11 м. За сколько дней?",
+        "5. Улитка за день заползает на 5 м, за ночь сползает на 3 м. Высота 17 м. На какой день?"
+      ]
+    }, {
+      id: 2,
+      title: "Числовая последовательность",
+      dates: "8–14 июля",
+      emoji: "🔢",
+      theory: {
+        analysis: {
+          title: "Найти следующее число",
+          condition: "19, 26, 34, 43, 53, ?",
+          solution: [
+            "26 − 19 = 7, 34 − 26 = 8, 43 − 34 = 9, 53 − 43 = 10",
+            "Значит, следующая разность = 11, и 53 + 11 = 64"
+          ],
+          answer: "64"
+        },
+        reference: [
+          "Ищи закономерность: сложение, умножение, степени",
+          "Выпиши разности между соседними членами"
+        ],
+        trick: {
+          title: "«Ищи скрытое правило!»",
+          text: "Иногда правило не очевидно. Пробуй разные варианты: разности, произведения, суммы цифр."
+        }
+      },
+      homework: [
+        "1. 1, 10, 11, 19, 21, 28, 31, 37, …, 46. Найдите недостающее.",
+        "2. 1, 3, 7, 15, …, 63. Найдите пропущенное.",
+        "3. 2, 10, 13, 21, 24, 32, 35, 43, …, 54. Найдите недостающее.",
+        "4. 1, 10, 11, 19, 21, 28, 31, 37, …, 46. Найдите пропущенное.",
+        "5. 7, 3, 1, 3, 3, 9, 7, … Найдите 2024-й член.",
+        "6. 3, 5, 7, 9, 11, 13, 17, 19, … Найдите лишний.",
+        "7. 2, 6, 12, 20, 30, … Найдите следующее.",
+        "8. 7, 15, 31, 63, … Найдите следующее.",
+        "9. 2023, 225, 47, 11, ? Найдите ?",
+        "10. 1, 2, 4, 6, 9, 12, 15, 19, 23, 27, 31. Найдите сумму двух пропущенных."
+      ]
+    }, {
+      id: 3,
+      title: "Задания на шифр",
+      dates: "15–21 июля",
+      emoji: "🔐",
+      theory: {
+        analysis: {
+          title: "Буква ↔ Цифра",
+          condition: "Определите число, соответствующее слову ҚАТАЛ.\nМАСАҚ — 97872\nБАТЫЛ — 36472\nҚАНАТ — 57862\nМЫСАЛ — 37479",
+          solution: [
+            "Буква Қ встречается в начале слова ҚАНАТ = 57862 → Қ = 5",
+            "Буква А встречается на 2-й позиции в ҚАНАТ → А = 7",
+            "Буква Т встречается на 3-й позиции в ҚАНАТ → Т = 8"
+          ],
+          answer: "57862"
+        },
+        reference: [
+          "Одинаковые буквы = одинаковые цифры",
+          "Начинай с буквы, которая встречается в нескольких словах"
+        ],
+        trick: {
+          title: "«Буква = Цифра»",
+          text: "Составь таблицу соответствий: буквы в одной колонке, цифры в другой!"
+        }
+      },
+      homework: [
+        "1. Определите число, соответствующее слову АҚҚУ.\nАҒЗА — 3118\nАҚҚУ — ?\nАҚСУ — 3158\nАЛҚА — 3913\nАМАЛ — 3439",
+        "2. Определите слово, соответствующее числу 7351.\n7273 — АЛТЫ\n3747 — ЛАҚА\n2167 — МЫНА\n5747 — ТАҚА\n7351 — ?",
+        "3. Определите слово, соответствующее числу 32476.\n31236 — АЛПЫС\n36178 — АШҚЫШ\n39879 — АТЛАС\n39178 — АСТЫҚ\n32476 — ?",
+        "4. Определите число, соответствующее слову АЛАМАН.\nАДЫРНА — 498302\nАЛАМАН — ?\nАТАУФА — 262902\nДАУЛАУ — 282125\nДҰЛЫҒА — 429829"
+      ]
+    }, {
+      id: 4,
+      title: "Нестандартные операции",
+      dates: "22–28 июля",
+      emoji: "⭐",
+      theory: {
+        analysis: {
+          title: "Найди скрытое правило",
+          condition: "3 ★ 2 = 5\n5 ★ 4 = 9\n7 ★ 1 = 8\n4 ★ 6 = ?",
+          solution: [
+            "Проверяем: 3 + 2 = 5 ✓, 5 + 4 = 9 ✓, 7 + 1 = 8 ✓",
+            "Правило: a ★ b = a + b",
+            "4 ★ 6 = 4 + 6 = 10"
+          ],
+          answer: "10"
+        },
+        reference: [
+          "Проверяй разные операции: +, −, ×, деление, степени",
+          "Правило должно работать для ВСЕХ данных примеров"
+        ],
+        trick: {
+          title: "«Метод перебора с проверкой»",
+          text: "Попробуй самые простые операции сначала: сложение, вычитание, умножение."
+        }
+      },
+      homework: [
+        "1. 7 ♦ 5 = 36, 2 ♦ 12 = 42, 14 ♦ 3 = 51, 25 ♦ 4 = ?",
+        "2. 198 □ 325 = 8, 684 □ 214 = 11, 973 □ 356 = 5, 875 □ 412 = ?",
+        "3. 16 + 6 = 52, 5 + 8 = 69, 6 + 7 = 55, 13 + 5 = ?",
+        "4. 13 ● 7 = 36, 21 ● 10 = 121, 13 ● 5 = 64, 9 ● 3 = ?",
+        "5. 5 ♦ 2 = (3,7,10), 4 ♦ 3 = (1,7,8), 2 ♦ 1 = (1,3,4), 3 ♦ 1 = ?"
+      ]
+    }, {
+      id: 5,
+      title: "Задачи на периодичность",
+      dates: "29 июля – 4 авг",
+      emoji: "🔄",
+      theory: {
+        analysis: {
+          title: "День недели через N дней",
+          condition: "Если сегодня пятница, какой день будет через 60 дней?",
+          solution: [
+            "60 ÷ 7 = 8 (полных недель) и остаток 4",
+            "Пятница → суббота(1) → воскресенье(2) → понедельник(3) → вторник(4)"
+          ],
+          answer: "Вторник"
+        },
+        reference: [
+          "Период дней недели = 7 дней",
+          "N mod 7 = остаток сдвига"
+        ],
+        trick: {
+          title: "«НОК — ключ к встречам!»",
+          text: "Несколько событий повторяются через НОК всех периодов."
+        }
+      },
+      homework: [
+        "1. Если сегодня пятница, какой день через 60 дней?",
+        "2. Если сегодня суббота, какой день через 50 дней?",
+        "3. Арман — каждые 3 дня, Асыл — 4 дня, Аман — 5 дней. Через сколько дней вместе?",
+        "4. 6 февраля — суббота. Какой день 18 марта?",
+        "5. Дежурство каждые 5 дней, первое в воскресенье. Какой день 21-е?",
+        "6. Саша — 3 дня, Коля — 4 дня, Петя — 5 дней. Встретились во вторник. Когда снова?",
+        "7. Сегодня воскресенье. Какой день был 326 дней назад?",
+        "8. Розу — 6 дней, ромашку — 4 дня. В пятницу полили вместе. Когда 6-й раз?",
+        "9. Азамат — 3 дня, Мадияр — 2 дня. В пятницу вместе. Когда 4-й раз?",
+        "10. Саша — 3 дня, Вася — 4 дня, Ваня — 5 дней. В понедельник вместе. Когда снова?"
+      ]
+    }, {
+      id: 6,
+      title: "Задачи на проценты",
+      dates: "5–11 августа",
+      emoji: "💯",
+      theory: {
+        analysis: {
+          title: "Проценты в задачах",
+          condition: "В школе 400 учеников. 60% занимаются спортом. Сколько учеников?",
+          solution: [
+            "60% от 400 = 400 × 60 / 100 = 240 учеников"
+          ],
+          answer: "240"
+        },
+        reference: [
+          "1% от числа N = N / 100",
+          "P% от числа N = N × P / 100"
+        ],
+        trick: {
+          title: "«Процент — это сотая доля»",
+          text: "35% = 35/100 = 0,35. Умей переводить проценты в десятичные дроби!"
+        }
+      },
+      homework: [
+        "Цена 1200 тг. Скидка 25%. Сколько стоит?",
+        "Решил 18 задач из 24. Какой процент?",
+        "Зарплата 50 000 тг. Увеличили на 20%. Сколько стала?",
+        "В сплаве 45 кг меди и 5 кг цинка. Какой % цинка?",
+        "После уменьшения на 30% число стало 350. Какое было до уменьшения?"
+      ]
+    }, {
+      id: 7,
+      title: "Комбинаторика и подсчёт",
+      dates: "12–18 августа",
+      emoji: "🎲",
+      theory: {
+        analysis: {
+          title: "Подсчёт вариантов",
+          condition: "Сколькими способами можно расставить 4 книги на полке?",
+          solution: [
+            "4 × 3 × 2 × 1 = 24 способа"
+          ],
+          answer: "24"
+        },
+        reference: [
+          "Правило произведения: m × n",
+          "Перестановки n предметов: n!"
+        ],
+        trick: {
+          title: "«Нарисуй дерево вариантов»",
+          text: "От одного узла проведи ветки для каждого варианта."
+        }
+      },
+      homework: [
+        "Сколькими способами расставить 5 книг?",
+        "Из 10 учеников выбрать 3. Сколько способов?",
+        "Сколько трёхзначных чисел из цифр 1,2,3,4 (без повторения)?",
+        "6 команд, каждая играет с каждой 1 раз. Сколько игр?",
+        "8 гостей, каждый жмёт руку каждому. Сколько рукопожатий?"
+      ]
+    }, {
+      id: 8,
+      title: "Вычисления",
+      dates: "19–25 августа",
+      emoji: "🧮",
+      theory: {
+        analysis: {
+          title: "Метод Гаусса",
+          condition: "Вычислите: 1 + 2 + 3 + … + 99 + 100",
+          solution: [
+            "1 + 100 = 101",
+            "2 + 99 = 101",
+            "Всего пар: 100 ÷ 2 = 50",
+            "Сумма = 50 × 101 = 5050"
+          ],
+          answer: "5050"
+        },
+        reference: [
+          "Складывай первое и последнее число",
+          "Количество пар = всего чисел ÷ 2",
+          "Сумма = количество пар × сумма одной пары"
+        ],
+        trick: {
+          title: "«Парами быстрее!»",
+          text: "В последовательности с одинаковым шагом складывай парами!"
+        }
+      },
+      homework: [
+        "1001 + 1003 + … + 2023\nA) 773143 B) 774144 C) 775155 D) 775255",
+        "1001 + 1003 + … + 2025\nA) 774144 B) 775155 C) 776169 D) 775255",
+        "6 + 7 + 8 + … + 23 + 24 = ?",
+        "1+3+5+…+99 → ?, 3+6+9+…+90 → ?, 2+4+6+…+100 → ?\nВарианты: 2500, 1395, 2550"
+      ]
+    }];
+
+    // ============================================================
+    // 10. ТАБЛИЦА ЛИДЕРОВ
+    // ============================================================
+    function getLeaders() {
+      try {
+        return JSON.parse(localStorage.getItem('mathLeaders')) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLeaders(leaders) {
+      localStorage.setItem('mathLeaders', JSON.stringify(leaders));
+    }
+
+    function addLeader() {
+      const name = document.getElementById('leaderName').value.trim();
+      const score = parseInt(document.getElementById('leaderScore').value);
+      if (!name || isNaN(score)) {
+        alert('Введите имя и баллы!');
+        return;
+      }
+      const leaders = getLeaders();
+      leaders.push({ name, score, date: new Date().toLocaleDateString() });
+      leaders.sort((a, b) => b.score - a.score);
+      saveLeaders(leaders);
+      document.getElementById('leaderName').value = '';
+      document.getElementById('leaderScore').value = '';
+      renderLeaderboard();
+      playSound('complete');
+    }
+
+    function clearLeaderboard() {
+      if (confirm('Очистить таблицу лидеров?')) {
+        saveLeaders([]);
+        renderLeaderboard();
+      }
+    }
+
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboard-list');
+      const leaders = getLeaders();
+      if (leaders.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.5);padding:16px;">Пока нет участников. Стань первым! 🏆</p>';
+        return;
+      }
+      let html = `
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>🏅</th>
+              <th>Имя</th>
+              <th>⭐ Баллы</th>
+              <th>📅 Дата</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      leaders.forEach((l, i) => {
+        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+        html += `
+          <tr>
+            <td class="${rankClass}">${medal}</td>
+            <td>${l.name}</td>
+            <td>${l.score}</td>
+            <td>${l.date || ''}</td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // ============================================================
+    // 11. RENDER MENU
+    // ============================================================
+    function renderMenu() {
+      const list = document.getElementById('menu-list');
+      list.innerHTML = '';
+      curriculum.forEach((w) => {
+        const progress = answers[w.id] ? Object.keys(answers[w.id]).filter(k => answers[w.id][k]?.trim()).length : 0;
+        const total = w.homework.length;
+        const card = document.createElement('button');
+        card.className = 'week-card';
+        card.onclick = () => showWeek(w.id);
+        card.innerHTML = `
+          <div class="week-card-emoji">${w.emoji}</div>
+          <div class="week-card-info">
+            <div class="week-card-title">${w.title}</div>
+            <div class="week-card-date">${w.dates}</div>
+            <div class="week-card-meta">
+              <span>${total} заданий</span>
+              ${progress > 0 ? `<span class="progress">✓ ${progress}/${total}</span>` : ''}
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    // ============================================================
+    // 12. RENDER WEEK (4-я неделя — задания в столбик)
+    // ============================================================
+    function renderWeek() {
+      document.getElementById('week-emoji').textContent = selectedWeek.emoji;
+      document.getElementById('week-title').textContent = selectedWeek.title;
+      document.getElementById('week-dates').textContent = selectedWeek.dates;
+
+      const content = document.getElementById('week-content');
+      content.innerHTML = '';
+
+      // ============================================================
+      // ДЛЯ 4-Й НЕДЕЛИ — СПЕЦИАЛЬНАЯ ВЕРСТКА (задания в столбик)
+      // ============================================================
+      if (selectedWeek.id === 4) {
+        // РАЗБОР
+        const analysisSection = document.createElement('div');
+        analysisSection.className = 'section';
+        let analysisHtml = '<h3>🔍 РАЗБОР ЗАДАЧ</h3>';
+
+        analysisHtml += `
+          <div style="background: rgba(0, 0, 0, 0.15); padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 3px solid #fcd34d;">
+            <h4 style="color: #fcd34d; font-size: 0.95rem; font-weight: 800; margin-bottom: 8px;">Найди скрытое правило</h4>
+            <p style="white-space: pre-line; font-size: 0.95rem; color: #e2e8f0; margin-bottom: 10px;">
+              <strong>Пример:</strong><br>
+              3 ★ 2 = 5<br>
+              5 ★ 4 = 9<br>
+              7 ★ 1 = 8<br>
+              4 ★ 6 = ?
+            </p>
+            <div style="margin-top: 8px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+              <div style="color: #4ade80; font-weight: 700;">✅ Решение:</div>
+              <div style="color: #e2e8f0; font-size: 0.9rem; line-height: 1.6;">
+                Проверяем: 3 + 2 = 5 ✓, 5 + 4 = 9 ✓, 7 + 1 = 8 ✓<br>
+                <span style="color: #fcd34d; font-weight: 700;">Правило: a ★ b = a + b</span><br>
+                4 ★ 6 = 4 + 6 = 10
+              </div>
+              <div class="answer" style="margin-top: 8px;">✅ Ответ: 10</div>
+            </div>
+          </div>
+        `;
+
+        analysisSection.innerHTML = analysisHtml;
+        content.appendChild(analysisSection);
+
+        // Справочник
+        const refSection = document.createElement('div');
+        refSection.className = 'section';
+        let refHtml = '<h3>📖 КРАТКИЙ СПРАВОЧНИК</h3><ul class="ref-list">';
+        selectedWeek.theory.reference.forEach(r => {
+          refHtml += `<li>${r}</li>`;
+        });
+        refHtml += '</ul>';
+        refSection.innerHTML = refHtml;
+        content.appendChild(refSection);
+
+        // Хитрость
+        const trickSection = document.createElement('div');
+        trickSection.className = 'section';
+        let trickHtml = '<h3>🌟 МАТЕМАТИЧЕСКАЯ ХИТРОСТЬ</h3>';
+        trickHtml += `<div class="trick-box"><h4>${selectedWeek.theory.trick.title}</h4><p>${selectedWeek.theory.trick.text}</p></div>`;
+        trickSection.innerHTML = trickHtml;
+        content.appendChild(trickSection);
+
+        // ============================================================
+        // ЗАДАНИЯ В СТОЛБИК (как на картинке)
+        // ============================================================
+        const hwSection = document.createElement('div');
+        hwSection.className = 'section';
+        let hwHtml = '<h3>✍️ САМОСТОЯТЕЛЬНАЯ РАБОТА</h3>';
+
+        const tasks = [
+          {
+            label: '1. Найдите закономерность и вычислите четвёртое выражение:',
+            options: 'I. 7 ★ 5 = 36\nII. 2 ★ 12 = 42\nIII. 14 ★ 3 = 51\nIV. 25 ★ 4 = ?',
+            answer: '125'
+          },
+          {
+            label: '2. Найдите закономерность и вычислите четвёртое выражение:',
+            options: 'I. 198 □ 325 = 8\nII. 684 □ 214 = 11\nIII. 973 □ 356 = 5\nIV. 875 □ 412 = ?',
+            answer: '10'
+          },
+          {
+            label: '3. Найдите закономерность и вычислите четвёртое выражение:',
+            options: 'I. 16 + 6 = 52\nII. 5 + 8 = 69\nIII. 6 + 7 = 55\nIV. 13 + 5 = ?',
+            answer: '68'
+          },
+          {
+            label: '4. Найдите закономерность и вычислите четвёртое выражение:',
+            options: 'I. 13 ★ 7 = 36\nII. 21 ★ 10 = 121\nIII. 13 ★ 5 = 64\nIV. 9 ★ 3 = ?',
+            answer: '36'
+          },
+          {
+            label: '5. Найдите закономерность и вычислите четвёртое выражение:',
+            options: 'I. 5 ★ 2 = (3, 7, 10)\nII. 4 ★ 3 = (1, 7, 8)\nIII. 2 ★ 1 = (1, 3, 4)\nIV. 3 ★ 1 = ?',
+            answer: '(2, 5, 7)'
+          }
+        ];
+
+        tasks.forEach((task, i) => {
+          const val = (answers[selectedWeek.id] && answers[selectedWeek.id][i]) ? answers[selectedWeek.id][i] : '';
+          const checkId = `check-${selectedWeek.id}-${i}`;
+          hwHtml += `
+            <div class="task">
+              <label>${task.label}</label>
+              <div class="options" style="white-space: pre-line; line-height: 1.8;">${task.options.replace(/\n/g, '<br>')}</div>
+              <input type="text" placeholder="✏️ Ваш ответ..." value="${val}" oninput="updateAnswer(${selectedWeek.id}, ${i}, this.value)">
+              <div class="task-result" id="${checkId}"></div>
+            </div>
+          `;
+        });
+
+        hwHtml += `<button class="send-btn" onclick="sendAnswers()">🚀 Отправить учителю</button>`;
+        hwHtml += `<button class="check-btn hidden" id="check-btn-${selectedWeek.id}" onclick="checkAnswers()">🎯 Проверить ответы</button>`;
+        hwHtml += `<p class="email-note">📧 ${TEACHER_EMAIL}</p>`;
+        hwSection.innerHTML = hwHtml;
+        content.appendChild(hwSection);
+
+      } else {
+        // ============================================================
+        // ДЛЯ ОСТАЛЬНЫХ НЕДЕЛЬ — СТАНДАРТНАЯ ВЕРСТКА
+        // ============================================================
+        // Разбор
+        const analysisSection = document.createElement('div');
+        analysisSection.className = 'section';
+        let analysisHtml = '<h3>🔍 РАЗБОР ЗАДАЧ</h3>';
+        analysisHtml += '<div class="analysis-box">';
+        analysisHtml += `<h4>${selectedWeek.theory.analysis.title}</h4>`;
+        analysisHtml += `<p>${selectedWeek.theory.analysis.condition.replace(/\n/g, '<br>')}</p>`;
+        selectedWeek.theory.analysis.solution.forEach(s => {
+          analysisHtml += `<div class="step">${s}</div>`;
+        });
+        analysisHtml += `<div class="answer">✅ Ответ: ${selectedWeek.theory.analysis.answer}</div>`;
+        analysisHtml += '</div>';
+        analysisSection.innerHTML = analysisHtml;
+        content.appendChild(analysisSection);
+
+        // Справочник
+        const refSection = document.createElement('div');
+        refSection.className = 'section';
+        let refHtml = '<h3>📖 КРАТКИЙ СПРАВОЧНИК</h3><ul class="ref-list">';
+        selectedWeek.theory.reference.forEach(r => {
+          refHtml += `<li>${r}</li>`;
+        });
+        refHtml += '</ul>';
+        refSection.innerHTML = refHtml;
+        content.appendChild(refSection);
+
+        // Хитрость
+        const trickSection = document.createElement('div');
+        trickSection.className = 'section';
+        let trickHtml = '<h3>🌟 МАТЕМАТИЧЕСКАЯ ХИТРОСТЬ</h3>';
+        trickHtml += `<div class="trick-box"><h4>${selectedWeek.theory.trick.title}</h4><p>${selectedWeek.theory.trick.text}</p></div>`;
+        trickSection.innerHTML = trickHtml;
+        content.appendChild(trickSection);
+
+        // Задания
+        const hwSection = document.createElement('div');
+        hwSection.className = 'section';
+        let hwHtml = '<h3>✍️ САМОСТОЯТЕЛЬНАЯ РАБОТА</h3>';
+
+        if (selectedWeek.id === 3) {
+          const tasksCipher = [
+            {
+              label: '1. Определите число, соответствующее слову АҚҚУ.',
+              options: 'АҒЗА — 3118\nАҚҚУ — ?\nАҚСУ — 3158\nАЛҚА — 3913\nАМАЛ — 3439',
+              answer: '3558'
+            },
+            {
+              label: '2. Определите слово, соответствующее числу 7351.',
+              options: '7273 — АЛТЫ\n3747 — ЛАҚА\n2167 — МЫНА\n5747 — ТАҚА\n7351 — ?',
+              answer: 'ҚАЗАҚ'
+            },
+            {
+              label: '3. Определите слово, соответствующее числу 32476.',
+              options: '31236 — АЛПЫС\n36178 — АШҚЫШ\n39879 — АТЛАС\n39178 — АСТЫҚ\n32476 — ?',
+              answer: 'АЛМАЗ'
+            },
+            {
+              label: '4. Определите число, соответствующее слову АЛАМАН.',
+              options: 'АДЫРНА — 498302\nАЛАМАН — ?\nАТАУФА — 262902\nДАУЛАУ — 282125\nДҰЛЫҒА — 429829',
+              answer: '498302'
+            }
+          ];
+
+          tasksCipher.forEach((task, i) => {
+            const val = (answers[selectedWeek.id] && answers[selectedWeek.id][i]) ? answers[selectedWeek.id][i] : '';
+            const checkId = `check-${selectedWeek.id}-${i}`;
+            hwHtml += `
+              <div class="task">
+                <label>${task.label}</label>
+                <div class="options">${task.options.replace(/\n/g, '<br>')}</div>
+                <input type="text" placeholder="✏️ Ваш ответ..." value="${val}" oninput="updateAnswer(${selectedWeek.id}, ${i}, this.value)">
+                <div class="task-result" id="${checkId}"></div>
+              </div>
+            `;
+          });
+        } else {
+          selectedWeek.homework.forEach((hw, i) => {
+            const val = (answers[selectedWeek.id] && answers[selectedWeek.id][i]) ? answers[selectedWeek.id][i] : '';
+            const checkId = `check-${selectedWeek.id}-${i}`;
+            hwHtml += `
+              <div class="task">
+                <label>${hw.replace(/\n/g, '<br>')}</label>
+                <input type="text" placeholder="✏️ Ваш ответ..." value="${val}" oninput="updateAnswer(${selectedWeek.id}, ${i}, this.value)">
+                <div class="task-result" id="${checkId}"></div>
+              </div>
+            `;
+          });
+        }
+
+        hwHtml += `<button class="send-btn" onclick="sendAnswers()">🚀 Отправить учителю</button>`;
+        hwHtml += `<button class="check-btn hidden" id="check-btn-${selectedWeek.id}" onclick="checkAnswers()">🎯 Проверить ответы</button>`;
+        hwHtml += `<p class="email-note">📧 ${TEACHER_EMAIL}</p>`;
+        hwSection.innerHTML = hwHtml;
+        content.appendChild(hwSection);
+      }
+
+      // Мотивация (для всех недель)
+      const motivation = motivations[selectedWeek.id - 1] || motivations[0];
+      const motivSection = document.createElement('div');
+      motivSection.className = 'motivation';
+      motivSection.innerHTML = `
+        <div class="motivation-emoji">${motivation.emoji}</div>
+        <div class="motivation-text">"${motivation.text}"</div>
+        <div class="motivation-author">${motivation.author}</div>
+      `;
+      content.appendChild(motivSection);
+    }
+
+    // ============================================================
+    // 13. RENDER TEST
+    // ============================================================
+    function renderTest(testId) {
+      const data = testData[testId];
+      if (!data) return;
+      currentTestId = testId;
+      document.getElementById('test-title').textContent = data.title;
+      document.getElementById('test-subtitle').textContent = data.subtitle;
+      const content = document.getElementById('test-content');
+      content.innerHTML = '';
+      if (!testAnswers[testId]) testAnswers[testId] = {};
+
+      data.questions.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.className = 'test-question';
+        const selected = testAnswers[testId][index] || '';
+        const checkId = `test-check-${testId}-${index}`;
+
+        let html = `<div class="question-text">${q.text.replace(/\n/g, '<br>')}</div>`;
+        html += `<div class="options-grid">`;
+
+        q.options.forEach(opt => {
+          const letter = opt.charAt(0);
+          const isSelected = selected === letter;
+          html += `
+            <button class="option-btn ${isSelected ? 'selected' : ''}" 
+                    onclick="selectOption('${testId}', ${index}, '${letter}')"
+                    id="${testId}-${index}-${letter}">
+              ${opt}
+            </button>
+          `;
+        });
+
+        html += `</div>`;
+        html += `<div class="task-result" id="${checkId}"></div>`;
+        div.innerHTML = html;
+        content.appendChild(div);
+      });
+
+      const checkBtn = document.createElement('button');
+      checkBtn.className = 'check-btn';
+      checkBtn.textContent = '🎯 Проверить тест';
+      checkBtn.onclick = () => checkTestInteractive(testId);
+      content.appendChild(checkBtn);
+    }
+
+    // ============================================================
+    // 14. ИНТЕРАКТИВНЫЕ ФУНКЦИИ
+    // ============================================================
+    function selectOption(testId, index, letter) {
+      initAudio();
+      const data = testData[testId];
+      if (!data) return;
+      if (!testAnswers[testId]) testAnswers[testId] = {};
+      testAnswers[testId][index] = letter;
+
+      const buttons = document.querySelectorAll(`#${testId}-${index}-\\w`);
+      buttons.forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'wrong', 'disabled');
+        if (btn.id.endsWith(letter)) {
+          btn.classList.add('selected');
+        }
+      });
+    }
+
+    function checkTestInteractive(testId) {
+      stopTestTimer();
+      const data = testData[testId];
+      if (!data) return;
+      let correctCount = 0;
+      const total = data.questions.length;
+
+      data.questions.forEach((q, index) => {
+        const userAnswer = testAnswers[testId]?.[index] || '';
+        const correct = q.answer;
+        const checkEl = document.getElementById(`test-check-${testId}-${index}`);
+
+        const buttons = document.querySelectorAll(`#${testId}-${index}-\\w`);
+        buttons.forEach(btn => {
+          btn.classList.add('disabled');
+          const letter = btn.id.split('-').pop();
+          if (letter === correct) {
+            btn.classList.add('correct');
+          } else if (letter === userAnswer && userAnswer !== correct) {
+            btn.classList.add('wrong');
+          }
+          if (letter === userAnswer) {
+            btn.classList.add('selected');
+          }
+        });
+
+        if (checkEl) {
+          if (userAnswer === correct) {
+            checkEl.textContent = '✅ Правильно!';
+            checkEl.className = 'task-result correct';
+            correctCount++;
+            playSound('correct');
+          } else if (userAnswer) {
+            checkEl.textContent = `❌ Неправильно. Правильный ответ: ${correct}`;
+            checkEl.className = 'task-result wrong';
+            playSound('wrong');
+          } else {
+            checkEl.textContent = '⚠️ Выберите вариант';
+            checkEl.className = 'task-result wrong';
+          }
+        }
+      });
+
+      const resultDiv = document.createElement('div');
+      resultDiv.className = 'test-result-summary';
+      const percent = Math.round(correctCount / total * 100);
+      resultDiv.textContent = `📊 Результат: ${correctCount} из ${total} правильных (${percent}%)`;
+      const oldResult = document.querySelector('.test-result-summary');
+      if (oldResult) oldResult.remove();
+      document.getElementById('test-content').appendChild(resultDiv);
+
+      if (correctCount === total) {
+        playSound('complete');
+      }
+
+      const leaders = getLeaders();
+      leaders.push({
+        name: 'Ученик',
+        score: correctCount,
+        date: new Date().toLocaleDateString()
+      });
+      leaders.sort((a, b) => b.score - a.score);
+      saveLeaders(leaders);
+    }
+
+    // ============================================================
+    // 15. ОСТАЛЬНЫЕ ФУНКЦИИ
+    // ============================================================
+    function updateAnswer(weekId, taskIndex, value) {
+      if (!answers[weekId]) answers[weekId] = {};
+      answers[weekId][taskIndex] = value;
+    }
+
+    function checkAnswers() {
+      const weekCorrect = correctAnswers[selectedWeek.id];
+      if (!weekCorrect) return;
+      weekCorrect.forEach((correct, i) => {
+        const userAnswer = (answers[selectedWeek.id]?.[i] || '').trim().toLowerCase().replace(/\s/g, '');
+        const correctClean = correct.toLowerCase().replace(/\s/g, '');
+        const checkEl = document.getElementById(`check-${selectedWeek.id}-${i}`);
+        if (checkEl) {
+          if (userAnswer === correctClean) {
+            checkEl.textContent = '✅ Правильно! Молодец!';
+            checkEl.className = 'task-result correct';
+            playSound('correct');
+          } else if (userAnswer) {
+            checkEl.textContent = `❌ Неправильно. Правильный ответ: ${correct}`;
+            checkEl.className = 'task-result wrong';
+            playSound('wrong');
+          } else {
+            checkEl.textContent = '⚠️ Введите ответ';
+            checkEl.className = 'task-result wrong';
+          }
+        }
+      });
+    }
+
+    function sendAnswers() {
+      const weekAnswers = answers[selectedWeek.id] || {};
+      const formattedAnswers = selectedWeek.homework.map((hw, i) =>
+        `Задание ${i + 1}:\n${hw}\nОтвет: ${weekAnswers[i] || '(не заполнено)'}`
+      ).join('\n\n');
+      const body = `Ответы ученика на тему: ${selectedWeek.title} (${selectedWeek.dates})\n\n${formattedAnswers}`;
+      const mailtoLink =
+        `mailto:${TEACHER_EMAIL}?subject=${encodeURIComponent('Ответы: ' + selectedWeek.title)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoLink;
+      const checkBtn = document.getElementById(`check-btn-${selectedWeek.id}`);
+      if (checkBtn) {
+        checkBtn.classList.remove('hidden');
+      }
+    }
+
+    // ============================================================
+    // 16. ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    setTimeout(createStarRain, 300);
+    showWelcome();
+
+    document.addEventListener('click', initAudio, { once: true });
+    document.addEventListener('touchstart', initAudio, { once: true });
+  </script>
+
+</body>
+</html>
